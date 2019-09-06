@@ -22,12 +22,15 @@ L’usage en est simple mais rébarbatif pour le moment. Cela dit, c’est  un h
 C’est de plus, l’application pure et simple d’un algorithme trouvé dans le bouquin de Christophe Blaess ( __programmation système sous linux__ ) dont j’ai saisi les capacités et compte bien instituer l’importance.
 
 Cbash est livré avec un exemple d'utilisation nommé youtube2mp3.c permettant de télécharger du contenu de playlist youtube, d'en faire des mp3 et d'y injecter les métadonnées. il s'utilise de la manère suivante.
+
 ./youtube2mp3 URL_PLAYLIST ARTISTE
+
+Ce programme/module n'est qu'une ébauche...
 
 Il est nécessaire, pour cet exemple, de disposer de [pup](https://github.com/ericchiang/pup/releases/tag/v0.4.0) et de [youtube-dl](https://github.com/ytdl-org/youtube-dl), ce dernier devant être à jour.
 
 Bonne réception et collaboration.
 
-##### AUTEUR
-#### Amaury Benard
-#### gunsailor66@gmail.com
+#### AUTEUR
+##### Amaury Benard
+##### gunsailor66@gmail.com
