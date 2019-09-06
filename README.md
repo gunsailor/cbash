@@ -25,7 +25,7 @@ Cbash est livré avec un exemple d'utilisation nommé youtube2mp3.c permettant d
 
 ./youtube2mp3 URL_PLAYLIST ARTISTE
 
-Ce programme/module n'est qu'une ébauche...
+Ce bout de code n'est qu'une ébauche... Entre  autre, il est impossible de télécharger un "top titre" si un coup de mollette de souris est nécessaire pour accéder aux chansons non loadées sur la page courante. Ainsi, ce code n'est-il valable que pour les albums.
 
 Il est nécessaire, pour cet exemple, de disposer de [pup](https://github.com/ericchiang/pup/releases/tag/v0.4.0) et de [youtube-dl](https://github.com/ytdl-org/youtube-dl), ce dernier devant être à jour.
 
