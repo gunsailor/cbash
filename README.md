@@ -28,6 +28,6 @@ Il est nécessaire, pour cet exemple, de disposer de [pup](https://github.com/er
 
 Bonne réception et collaboration.
 
-**AUTEUR**
-### Amaury Benard
-### gunsailor66@gmail.com
+##### AUTEUR
+#### Amaury Benard
+#### gunsailor66@gmail.com
