@@ -40,24 +40,24 @@ int process_pipe(char** commands, int fd[2], pid_t *son)
 	return EXIT_SUCCESS;
 }
 
-int process_popen(char ** result, char** commands, int args, int *size)
+int process_popen(process_datas * p)
 {
         FILE* fd;
 	int len = 0;
-	for(int i = 0; i < args - 1; i++)
+	for(int i = 0; i < p->args[0][1] - 1; i++)
 	{
-		len += strlen(commands[i]) + 2;
+		len += strlen(p->commands[0][i]) + 2;
 	}
         char *command = calloc(len, sizeof(char));
 	char *c = command;
-	for(int i = 0; i < args - 1; i++)
+	for(int i = 0; i < p->args[0][1] - 1; i++)
 	{
-		sprintf(command, "%s ", commands[i]);
-		command += strlen(commands[i]) + 1;
+		sprintf(command, "%s ", p->commands[0][i]);
+		command += strlen(p->commands[0][i]) + 1;
 	}
         if((fd = popen(c, "r")) != NULL)
         {
-		if(file_fgetsn(result, fd, size))
+		if(file_fgetsn(&p->interresult, fd, &p->interresultlen))
 		{
 			free(command - strlen(c));
 			pclose(fd);
@@ -157,8 +157,6 @@ int process_finished(pid_t pid)
 int process_exec(process_datas *p)
 {
 	int ret = 0, k = 0;
-	char * result = NULL;
-	int size= 0;
 	int args = p->args[p->size - 1][1]++;
 	if(args > p->args[p->size - 1][0])
 	{
@@ -171,24 +169,20 @@ int process_exec(process_datas *p)
 	p->execcount++;
 	p->result = realloc(p->result, p->execcount * sizeof(char*));
 
-	if((ret = process_datas_internal(p, &result, &size, &k)) == EXIT_FAILURE)
+	if((ret = process_datas_internal(p, &k)) == EXIT_FAILURE)
 	{
-		free(result);
-		perror("Error in first command in process_exec: not / or bad internal process");
+		perror("Error in first process_datas_internal from process_exec: not / or bad internal process");
 		return EXIT_FAILURE;
 	}else if(ret == 254 || ret == 255 || ret == EXIT_SUCCESS){
-		if((ret = process_popen(&result, p->commands[0], p->args[0][1], &size)) == EXIT_FAILURE)
+		if((ret = process_popen(p)) == EXIT_FAILURE)
 		{
-			if(result != NULL)
-				free(result);
 			perror("Error in first command in process_exec from process_popen\n");
 			return EXIT_FAILURE;
 		}
 	}
 	if(p->size == 1)
 	{
-		p->result[p->execcount - 1] = strdup(result);
-		free(result);
+		p->result[p->execcount - 1] = strdup(p->interresult);
 		process_datas_init(p);
 		return EXIT_SUCCESS;
 	}
@@ -197,82 +191,78 @@ int process_exec(process_datas *p)
 	int error;
         for(int i = 1; i < p->size; i++)
         {
-		if((ret = process_datas_internal(p, &result, &size, &i)) == EXIT_FAILURE)
+		if((ret = process_datas_internal(p, &i)) == EXIT_FAILURE)
 		{
-			free(result);
 			perror("Bad internal process");
 			return EXIT_FAILURE;
 		}else if(i == p->size)
 			break;
 		if((ret = process_pipe(p->commands[i], tube, &son))) {
-			free(result);
 			perror("fail to process_pipe in process_exec");
 			return errno;
 		}
-		if(fd_writen(tube[1], result, strlen(result), 1))
+		if(fd_writen(tube[1], p->interresult, strlen(p->interresult), 1))
 		{
-			free(result);
 			perror("fail to write in fd in process_exec");
 			return EXIT_FAILURE;
 		}
 		close(tube[1]);
 		if((error = process_finished(son)) != EXIT_SUCCESS)
-		{
-			free(result);
 			return error;
-		}
-		if(fd_readn(&result, tube[0], &size))
+		if(fd_readn(&p->interresult, tube[0], &p->interresultlen))
 		{
-			free(result);
 			perror("fail to read from fd in process_exec");
 			return EXIT_FAILURE;
 		}
 		close(tube[0]);
 	}
-	p->result[p->execcount - 1] = strdup(result);
-	free(result);
+	p->result[p->execcount - 1] = strdup(p->interresult);
 	process_datas_init(p);
         
 	return EXIT_SUCCESS;
 
 }
 
-int process_datas_internal(process_datas *p, char **result, int *size, int *i)
+int process_datas_internal(process_datas *p, int *i)
 {
 	if(!strcmp(p->commands[*i][0], "file"))
 	{
+		if(!strlen(p->interresult))
+			return EXIT_FAILURE;
 		FILE *f = fopen(p->commands[*i][1], "w+");
 		if (f == NULL)
 		{
-			free(*result);
 			perror("Error opening file in process_exec\n");
 			return EXIT_FAILURE;
 		}
 
-		fprintf(f, *result);
+		fprintf(f, p->interresult);
 
 		fclose(f);
 		++(*i);
 		return 254;
 	}else if(!strcmp(p->commands[*i][0], "cd")){
+		if(!strlen(p->commands[*i][1]))
+			return EXIT_FAILURE;
 		chdir(p->commands[*i][1]);
 		++(*i);
 		return 255;
 	}else if(!strcmp(p->commands[*i][0], "concat")){
+		if(!strlen(p->commands[*i][1]))
+			return EXIT_FAILURE;
 		int len = 0;
 		for(int l = 1; l < p->args[*i][1] - 1; l++)
 			len += strlen(p->commands[*i][l]);
-		if(*size < len){
-			if(*result == NULL)
-				*result = calloc(len +1,  sizeof(char));
-			else
-				*result = realloc(*result, (len + 1) * sizeof(char));
-			*size = len;
+		if(p->interresult == NULL)
+			p->interresult = calloc(len +1,  sizeof(char));
+		else if(p->interresultlen < len){
+			p->interresult = realloc(p->interresult, (len + 1) * sizeof(char));
+			p->interresultlen = len;
 		}
-		strncpy(*result, p->commands[*i][1], strlen(p->commands[*i][1]));
+		strncpy(p->interresult, p->commands[*i][1], strlen(p->commands[*i][1]));
 		for(int l = 2; l < p->args[*i][1] - 1; l++)
 		{
-			strncat(*result, p->commands[*i][l], strlen(p->commands[*i][l]));
+			strncat(p->interresult, p->commands[*i][l], strlen(p->commands[*i][l]));
 		}
 		++(*i);
 		return 256;
@@ -291,6 +281,8 @@ int process_datas_init(process_datas *p)
 		}
 		p->args[i][1] = 1;
 	}
+	for(int i = 0; i < p->interresultlen;i++)
+		p->interresult[i]='\0';
 	p->size = 0;
 	
 	return EXIT_SUCCESS;
@@ -331,6 +323,9 @@ int process_datas_destroy(process_datas *p)
 	}
 	free(p->result);
 	p->result = NULL;
+	free(p->interresult);
+	p->interresult = NULL;
+	p->interresultlen = 0;
 	p->execcount = 0;
 	return EXIT_SUCCESS;
 }
