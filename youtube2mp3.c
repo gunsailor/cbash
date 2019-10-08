@@ -8,7 +8,7 @@
 int main(int argc, char **argv)
 {
 	int ret;
-	process_datas p = {NULL, NULL, NULL, 0, 0, 0};
+	process_datas p = {NULL, NULL, NULL, NULL, 0, 0, 0, 0};
 	char *cwd = calloc(1,256);
 	getcwd(cwd, 256);
 	process_append_cmd("/usr/bin/wget", &p, 0);
@@ -87,103 +87,103 @@ int main(int argc, char **argv)
 
 					if(!(ret = process_exec(&p)))
 					{
-						process_append_cmd("/bin/ls", &p, 0);
-						process_append_cmd("file", &p, 0);
-						process_append_cmd(argv[2], &p, 1);
-						process_append_cmd("/bin/sed", &p, 0);
-						process_append_cmd("-i", &p, 1);
-						process_append_cmd("-es;\\(.*\\)-[^ ]*.mp3;\\1;g", &p, 1);
-						process_append_cmd(argv[2], &p, 1);
-						process_append_cmd("/bin/cat", &p, 0);
-						process_append_cmd(argv[2], &p, 1);
-						process_append_cmd("/usr/bin/xargs", &p, 0);
-						process_append_cmd("-n1", &p, 1);
-						process_append_cmd("-I[]", &p, 1);
-						process_append_cmd("/usr/bin/find", &p, 1);
-						process_append_cmd("-name", &p, 1);
-						process_append_cmd("*[]*", &p, 1);
-						process_append_cmd("-exec", &p, 1);
-						process_append_cmd("/bin/mv", &p, 1);
-						process_append_cmd("{}", &p, 1);
-						process_append_cmd("[].mp3", &p, 1);
-						process_append_cmd("\;", &p, 1);
-						process_append_cmd("/bin/rm", &p, 0);
-						process_append_cmd(argv[2], &p, 1);
+						//process_append_cmd("/bin/ls", &p, 0);
+						//process_append_cmd("file", &p, 0);
+						//process_append_cmd(argv[2], &p, 1);
+						//process_append_cmd("/bin/sed", &p, 0);
+						//process_append_cmd("-i", &p, 1);
+						//process_append_cmd("-es;\\(.*\\)-[^ ]*.mp3;\\1;g", &p, 1);
+						//process_append_cmd(argv[2], &p, 1);
+						//process_append_cmd("/bin/cat", &p, 0);
+						//process_append_cmd(argv[2], &p, 1);
+						//process_append_cmd("/usr/bin/xargs", &p, 0);
+						//process_append_cmd("-n1", &p, 1);
+						//process_append_cmd("-I[]", &p, 1);
+						//process_append_cmd("/usr/bin/find", &p, 1);
+						//process_append_cmd("-name", &p, 1);
+						//process_append_cmd("*[]*", &p, 1);
+						//process_append_cmd("-exec", &p, 1);
+						//process_append_cmd("/bin/mv", &p, 1);
+						//process_append_cmd("{}", &p, 1);
+						//process_append_cmd("[].mp3", &p, 1);
+						//process_append_cmd("\;", &p, 1);
+						//process_append_cmd("/bin/rm", &p, 0);
+						//process_append_cmd(argv[2], &p, 1);
 
-						if(!(ret = process_exec(&p)))
-						{
-							process_append_cmd("concat", &p, 0);
-							process_append_cmd("artist=", &p, 1);
-							process_append_cmd(argv[2], &p, 1);
+						//if(!(ret = process_exec(&p)))
+						//{
+						//	process_append_cmd("concat", &p, 0);
+						//	process_append_cmd("artist=", &p, 1);
+						//	process_append_cmd(argv[2], &p, 1);
 
-							if(!(ret = process_exec(&p)))
-							{
-								process_append_cmd("concat", &p, 0);
-								process_append_cmd("album=", &p, 1);
-								process_append_cmd(p.result[1], &p, 1);
+						//	if(!(ret = process_exec(&p)))
+						//	{
+						//		process_append_cmd("concat", &p, 0);
+						//		process_append_cmd("album=", &p, 1);
+						//		process_append_cmd(p.result[1], &p, 1);
 
-								if(!(ret = process_exec(&p)))
-								{
-									process_append_cmd("/bin/ls", &p, 0);
-									process_append_cmd("/usr/bin/cut", &p, 0);
-									process_append_cmd("-d.", &p, 1);
-									process_append_cmd("-f1", &p, 1);
-									process_append_cmd("/usr/bin/xargs", &p, 0);
-									process_append_cmd("-n1", &p, 1);
-									process_append_cmd("-I{}", &p, 1);
-									process_append_cmd("/usr/bin/ffmpeg", &p, 1);
-									process_append_cmd("-i", &p, 1);
-									process_append_cmd("{}.mp3", &p, 1);
-									process_append_cmd("-metadata", &p, 1);
-									process_append_cmd(p.result[6], &p, 1);
-									process_append_cmd("-metadata", &p, 1);
-									process_append_cmd(p.result[7], &p, 1);
-									process_append_cmd("-metadata", &p, 1);
-									process_append_cmd("title={}", &p, 1);
-									process_append_cmd("-ab", &p, 1);
-									process_append_cmd("256k", &p, 1);
-									process_append_cmd("{}.true.mp3", &p, 1);
-									process_append_cmd("/bin/ls", &p, 0);
-									process_append_cmd("/bin/grep", &p, 0);
-									process_append_cmd("-v", &p, 1);
-									process_append_cmd("true", &p, 1);
-									process_append_cmd("/usr/bin/xargs", &p, 0);
-									process_append_cmd("-n1", &p, 1);
-									process_append_cmd("-I{}", &p, 1);
-									process_append_cmd("/bin/rm", &p, 1);
-									process_append_cmd("{}", &p, 1);
+						//		if(!(ret = process_exec(&p)))
+						//		{
+						//			process_append_cmd("/bin/ls", &p, 0);
+						//			process_append_cmd("/usr/bin/cut", &p, 0);
+						//			process_append_cmd("-d.", &p, 1);
+						//			process_append_cmd("-f1", &p, 1);
+						//			process_append_cmd("/usr/bin/xargs", &p, 0);
+						//			process_append_cmd("-n1", &p, 1);
+						//			process_append_cmd("-I{}", &p, 1);
+						//			process_append_cmd("/usr/bin/ffmpeg", &p, 1);
+						//			process_append_cmd("-i", &p, 1);
+						//			process_append_cmd("{}.mp3", &p, 1);
+						//			process_append_cmd("-metadata", &p, 1);
+						//			process_append_cmd(p.result[6], &p, 1);
+						//			process_append_cmd("-metadata", &p, 1);
+						//			process_append_cmd(p.result[7], &p, 1);
+						//			process_append_cmd("-metadata", &p, 1);
+						//			process_append_cmd("title={}", &p, 1);
+						//			process_append_cmd("-ab", &p, 1);
+						//			process_append_cmd("256k", &p, 1);
+						//			process_append_cmd("{}.true.mp3", &p, 1);
+						//			process_append_cmd("/bin/ls", &p, 0);
+						//			process_append_cmd("/bin/grep", &p, 0);
+						//			process_append_cmd("-v", &p, 1);
+						//			process_append_cmd("true", &p, 1);
+						//			process_append_cmd("/usr/bin/xargs", &p, 0);
+						//			process_append_cmd("-n1", &p, 1);
+						//			process_append_cmd("-I{}", &p, 1);
+						//			process_append_cmd("/bin/rm", &p, 1);
+						//			process_append_cmd("{}", &p, 1);
 
-									if(!(ret = process_exec(&p)))
-									{
-										printf("downloaded !\n");
-									}else{
-										free(cwd);
-										process_datas_destroy(&p);
-										fprintf(stderr, "failed 9: %s \n", strerror(ret));
-										fflush(stderr);
-										exit(EXIT_FAILURE);
-									}
-								}else{
-									free(cwd);
-									process_datas_destroy(&p);
-									fprintf(stderr, "failed 8: %s \n", strerror(ret));
-									fflush(stderr);
-									exit(EXIT_FAILURE);
-								}
-      				        		}else{
-      				        			free(cwd);
-      				        			process_datas_destroy(&p);
-      				        			fprintf(stderr, "failed 7: %s \n", strerror(ret));
-      				        			fflush(stderr);
-      				        			exit(EXIT_FAILURE);
-      				        		}
-						}else{
-							free(cwd);
-							process_datas_destroy(&p);
-							fprintf(stderr, "failed 6: %s \n", strerror(ret));
-							fflush(stderr);
-							exit(EXIT_FAILURE);
-						}
+						//			if(!(ret = process_exec(&p)))
+						//			{
+						//				printf("downloaded !\n");
+						//			}else{
+						//				free(cwd);
+						//				process_datas_destroy(&p);
+						//				fprintf(stderr, "failed 9: %s \n", strerror(ret));
+						//				fflush(stderr);
+						//				exit(EXIT_FAILURE);
+						//			}
+						//		}else{
+						//			free(cwd);
+						//			process_datas_destroy(&p);
+						//			fprintf(stderr, "failed 8: %s \n", strerror(ret));
+						//			fflush(stderr);
+						//			exit(EXIT_FAILURE);
+						//		}
+      				        	//	}else{
+      				        	//		free(cwd);
+      				        	//		process_datas_destroy(&p);
+      				        	//		fprintf(stderr, "failed 7: %s \n", strerror(ret));
+      				        	//		fflush(stderr);
+      				        	//		exit(EXIT_FAILURE);
+      				        	//	}
+						//}else{
+						//	free(cwd);
+						//	process_datas_destroy(&p);
+						//	fprintf(stderr, "failed 6: %s \n", strerror(ret));
+						//	fflush(stderr);
+						//	exit(EXIT_FAILURE);
+						//}
 					}else{
 						free(cwd);
 						process_datas_destroy(&p);
